@@ -39,7 +39,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setSupportActionBar((Toolbar) findViewById(R.id.tool_bar));
+
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         WordEntityAdapter adapter = new WordEntityAdapter();

@@ -1,1 +1,2 @@
+include ':naturalsortorder'
 include ':app'
