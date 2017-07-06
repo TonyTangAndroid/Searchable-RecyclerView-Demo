@@ -1,7 +1,9 @@
 package com.github.wrdlbrnft.searchablerecyclerviewdemo.ui.activities;
 
-public class WordEntity {
+import java.util.Comparator;
 
+public class WordEntity {
+    public static final WordEntityRankComparator wordEntityRankComparator = new WordEntityRankComparator();
     private final long id;
     private final int rank;
     private final String word;
@@ -11,6 +13,15 @@ public class WordEntity {
         this.rank = rank;
         this.word = word;
     }
+
+    public boolean areContentsTheSame(WordEntity article) {
+        return this.equals(article);
+    }
+
+    public boolean areItemsTheSame(WordEntity article) {
+        return this.getId() == article.getId();
+    }
+
 
     public long getId() {
         return id;
@@ -28,4 +39,12 @@ public class WordEntity {
     public String toString() {
         return "";
     }
+
+    public static class WordEntityRankComparator implements Comparator<WordEntity> {
+        @Override
+        public int compare(WordEntity first, WordEntity second) {
+            return Integer.compare(first.getRank(), second.getRank());
+        }
+    }
+
 }

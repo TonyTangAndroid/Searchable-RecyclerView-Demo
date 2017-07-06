@@ -2,16 +2,13 @@ package com.github.wrdlbrnft.searchablerecyclerviewdemo.ui.activities;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.util.Pair;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SearchView;
@@ -21,7 +18,6 @@ import com.jakewharton.rxbinding2.widget.RxSearchView;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import hugo.weaving.DebugLog;
@@ -29,15 +25,14 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
 
     private List<WordEntity> wordEntityArrayList;
-    private WordEntityAdapter adapter;
     private Disposable disposable;
     private SearchView searchView;
+    private WordEntityDataset dataset;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,9 +42,19 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        adapter = new WordEntityAdapter();
+        WordEntityAdapter adapter = new WordEntityAdapter();
+        dataset = new WordEntityDataset(recyclerView, adapter);
+        adapter.articleDataset(dataset);
         recyclerView.setAdapter(adapter);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.post(this::startSearchObservation);
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        disposable.dispose();
     }
 
 
@@ -57,18 +62,15 @@ public class MainActivity extends AppCompatActivity {
         disposable = RxSearchView.queryTextChanges(searchView)
                 .startWith("")
                 .observeOn(AndroidSchedulers.mainThread())
-                .switchMap(new Function<CharSequence, ObservableSource<? extends List<WordEntity>>>() {
-                    @Override
-                    public ObservableSource<List<WordEntity>> apply(@NonNull CharSequence charSequence) throws Exception {
-                        return Observable.fromCallable(() -> doFilter(charSequence)).subscribeOn(Schedulers.computation());
-                    }
-                })
-                .scan(Pair.create(Collections.emptyList(), null), this::doCalculateDiff)
-                .skip(1)
+                .switchMap(this::doSwitchMap)
                 .observeOn(AndroidSchedulers.mainThread())
-                .distinctUntilChanged(listDiffResultPair -> listDiffResultPair.first)
+                .distinctUntilChanged()
                 .subscribe(this::onDataReady);
 
+    }
+
+    private ObservableSource<List<WordEntity>> doSwitchMap(@NonNull CharSequence charSequence) {
+        return Observable.just(charSequence).map(MainActivity.this::doFilter).subscribeOn(Schedulers.computation());
     }
 
     private List<WordEntity> getFilteredList(String query) {
@@ -94,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
     private List<WordEntity> initAndGetWordEntityList() {
         if (wordEntityArrayList == null) {
             wordEntityArrayList = new ArrayList<>();
-            final String[] words = getResources().getStringArray(R.array.words_less);
+            final String[] words = getResources().getStringArray(R.array.words);
             for (int i = 0; i < words.length; i++) {
                 wordEntityArrayList.add(new WordEntity(i, i + 1, words[i]));
             }
@@ -105,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
     @DebugLog
     private List<WordEntity> doFilter(CharSequence searchViewQueryTextEvent) {
         try {
-            Thread.sleep(1);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             //if it is switchMap, the thread will be interrupted and the result will not be ignored in the downstream.
             // If it is flatMap, the thread won't be interrupted and the result will be ignored in the downstream except the latest one, which is exactly what we need in search use case.
@@ -123,24 +125,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @DebugLog
-    private void onDataReady(Pair<List<WordEntity>, DiffUtil.DiffResult> listDiffResultPair) {
-        adapter.setDataList(listDiffResultPair.first);
-        listDiffResultPair.second.dispatchUpdatesTo(adapter);
+    private void onDataReady(List<WordEntity> dataList) {
+        dataset.changeData(dataList);
     }
 
-    @DebugLog
-    @NonNull
-    private Pair<List<WordEntity>, DiffUtil.DiffResult> doCalculateDiff(Pair<List<WordEntity>, DiffUtil.DiffResult> pair, List<WordEntity> next) {
-        WordEntityDiffCallback callback = new WordEntityDiffCallback(pair.first, next);
-        Log.d("MainActivity", "raw data source size : " + pair.first.size());
-        DiffUtil.DiffResult result = DiffUtil.calculateDiff(callback);
-        return Pair.create(next, result);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        disposable.dispose();
-    }
 
 }

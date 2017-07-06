@@ -7,11 +7,12 @@ import android.view.ViewGroup;
 
 import com.github.wrdlbrnft.searchablerecyclerviewdemo.R;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class WordEntityAdapter extends RecyclerView.Adapter<WordEntityViewHolder> {
-    private List<WordEntity> things = new ArrayList<>();
+    private WordEntityDataset dataset;
+
+    public void articleDataset(WordEntityDataset dataset) {
+        this.dataset = dataset;
+    }
 
     @Override
     public WordEntityViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -21,16 +22,13 @@ public class WordEntityAdapter extends RecyclerView.Adapter<WordEntityViewHolder
 
     @Override
     public void onBindViewHolder(WordEntityViewHolder holder, int position) {
-        WordEntity wordEntity = things.get(position);
+        WordEntity wordEntity = dataset.getWordEntity(position);
         holder.bind(wordEntity);
     }
 
     @Override
     public int getItemCount() {
-        return things.size();
+        return dataset.size();
     }
 
-    public void setDataList(List<WordEntity> wordEntityList) {
-        this.things = wordEntityList;
-    }
 }
