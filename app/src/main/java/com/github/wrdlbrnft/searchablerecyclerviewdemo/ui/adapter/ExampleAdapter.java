@@ -1,39 +1,61 @@
 package com.github.wrdlbrnft.searchablerecyclerviewdemo.ui.adapter;
 
-import android.content.Context;
-import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
-import com.github.wrdlbrnft.searchablerecyclerviewdemo.databinding.ItemWordBinding;
+import com.github.wrdlbrnft.searchablerecyclerviewdemo.R;
 import com.github.wrdlbrnft.searchablerecyclerviewdemo.ui.adapter.viewholder.WordViewHolder;
 import com.github.wrdlbrnft.searchablerecyclerviewdemo.ui.models.WordModel;
-import com.github.wrdlbrnft.sortedlistadapter.SortedListAdapter;
 
-import java.util.Comparator;
+import java.util.List;
+
+import hugo.weaving.DebugLog;
 
 /**
  * Created with Android Studio
  * User: Xaver
  * Date: 24/05/15
  */
-public class ExampleAdapter extends SortedListAdapter<WordModel> {
+public class ExampleAdapter extends RecyclerView.Adapter<WordViewHolder> {
 
-    public interface Listener {
-        void onExampleModelClicked(WordModel model);
+
+    private List<WordModel> wordModelList;
+    private List<WordModel> filterWordModelList;
+
+    public List<WordModel> getWordModelList() {
+        return wordModelList;
     }
 
-    private final Listener mListener;
-
-    public ExampleAdapter(Context context, Comparator<WordModel> comparator, Listener listener) {
-        super(context, WordModel.class, comparator);
-        mListener = listener;
+    public void setWordModelList(List<WordModel> wordModelList) {
+        this.wordModelList = wordModelList;
+        this.filterWordModelList = wordModelList;
+        notifyDataSetChanged();
     }
 
-    @NonNull
+    public List<WordModel> getFilterWordModelList() {
+        return filterWordModelList;
+    }
+
+    public void setFilterWordModelList(List<WordModel> filterWordModelList) {
+        this.filterWordModelList = filterWordModelList;
+    }
+
+    @DebugLog
     @Override
-    protected ViewHolder<? extends WordModel> onCreateViewHolder(@NonNull LayoutInflater inflater, @NonNull ViewGroup parent, int viewType) {
-        final ItemWordBinding binding = ItemWordBinding.inflate(inflater, parent, false);
-        return new WordViewHolder(binding, mListener);
+    public WordViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_word, parent, false);
+        return new WordViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(WordViewHolder holder, int position) {
+        holder.bind(getFilterWordModelList().get(position));
+    }
+
+    @Override
+    public int getItemCount() {
+        return filterWordModelList != null ? filterWordModelList.size() : 0;
     }
 }

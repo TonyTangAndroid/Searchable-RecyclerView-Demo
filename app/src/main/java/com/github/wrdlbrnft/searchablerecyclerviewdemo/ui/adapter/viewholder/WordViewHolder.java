@@ -1,25 +1,33 @@
 package com.github.wrdlbrnft.searchablerecyclerviewdemo.ui.adapter.viewholder;
 
-import android.support.annotation.NonNull;
+import android.annotation.SuppressLint;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.TextView;
 
-import com.github.wrdlbrnft.searchablerecyclerviewdemo.databinding.ItemWordBinding;
-import com.github.wrdlbrnft.searchablerecyclerviewdemo.ui.adapter.ExampleAdapter;
+import com.github.wrdlbrnft.searchablerecyclerviewdemo.R;
 import com.github.wrdlbrnft.searchablerecyclerviewdemo.ui.models.WordModel;
-import com.github.wrdlbrnft.sortedlistadapter.SortedListAdapter;
 
-public class WordViewHolder extends SortedListAdapter.ViewHolder<WordModel> {
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
-    private final ItemWordBinding mBinding;
+public class WordViewHolder extends RecyclerView.ViewHolder {
 
-    public WordViewHolder(ItemWordBinding binding, ExampleAdapter.Listener listener) {
-        super(binding.getRoot());
-        binding.setListener(listener);
+    @BindView(R.id.tv_rank)
+    TextView tvRank;
+    @BindView(R.id.tv_value)
+    TextView tvValue;
 
-        mBinding = binding;
+    public WordViewHolder(View view) {
+        super(view);
+        ButterKnife.bind(this, view);
     }
 
-    @Override
-    protected void performBind(@NonNull WordModel item) {
-        mBinding.setModel(item);
+
+    @SuppressLint("SetTextI18n")
+    public void bind(final WordModel item) {
+
+        tvRank.setText(item.getRank() + "");
+        tvValue.setText(item.getWord());
     }
 }
