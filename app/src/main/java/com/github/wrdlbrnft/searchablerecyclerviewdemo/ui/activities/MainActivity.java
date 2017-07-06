@@ -6,10 +6,12 @@ import android.support.v4.util.Pair;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.util.DiffUtil;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SearchView;
@@ -44,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar((Toolbar) findViewById(R.id.tool_bar));
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
         adapter = new WordEntityAdapter();
         recyclerView.setAdapter(adapter);
         recyclerView.post(this::startSearchObservation);
@@ -102,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
     @DebugLog
     private List<WordEntity> doFilter(CharSequence searchViewQueryTextEvent) {
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1);
         } catch (InterruptedException e) {
             //if it is switchMap, the thread will be interrupted and the result will not be ignored in the downstream.
             // If it is flatMap, the thread won't be interrupted and the result will be ignored in the downstream except the latest one, which is exactly what we need in search use case.
@@ -129,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
     @NonNull
     private Pair<List<WordEntity>, DiffUtil.DiffResult> doCalculateDiff(Pair<List<WordEntity>, DiffUtil.DiffResult> pair, List<WordEntity> next) {
         WordEntityDiffCallback callback = new WordEntityDiffCallback(pair.first, next);
+        Log.d("MainActivity", "raw data source size : " + pair.first.size());
         DiffUtil.DiffResult result = DiffUtil.calculateDiff(callback);
         return Pair.create(next, result);
     }
