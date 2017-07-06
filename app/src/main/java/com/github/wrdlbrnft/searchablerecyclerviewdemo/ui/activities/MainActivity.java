@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         final MenuItem searchItem = menu.findItem(R.id.action_search);
         searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
     @DebugLog
