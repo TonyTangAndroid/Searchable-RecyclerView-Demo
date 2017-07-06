@@ -3,8 +3,6 @@
           package="com.github.wrdlbrnft.searchablerecyclerviewdemo">
 
     <application
-        android:name=".ui.activities.WordApplication"
-        android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">

@@ -4,10 +4,7 @@ import android.support.v7.util.DiffUtil;
 
 import java.util.List;
 
-/**
- * Created by ztang on 7/6/17.
- */
-class WordEntityDiffCallback extends DiffUtil.Callback {
+public class WordEntityDiffCallback extends DiffUtil.Callback {
     private List<WordEntity> current;
     private List<WordEntity> next;
 

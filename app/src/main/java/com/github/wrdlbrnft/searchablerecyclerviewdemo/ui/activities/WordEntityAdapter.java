@@ -10,23 +10,19 @@ import com.github.wrdlbrnft.searchablerecyclerviewdemo.R;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by ztang on 7/6/17.
- */
-class WordEntityAdapter extends RecyclerView.Adapter<WordEntityViewHolder> {
-    private List<WordEntity> things = new ArrayList<>(); // Start with empty list
+public class WordEntityAdapter extends RecyclerView.Adapter<WordEntityViewHolder> {
+    private List<WordEntity> things = new ArrayList<>();
 
     @Override
     public WordEntityViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_word, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_word, parent, false);
         return new WordEntityViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(WordEntityViewHolder holder, int position) {
-        WordEntity thing = things.get(position);
-        holder.bind(thing);
+        WordEntity wordEntity = things.get(position);
+        holder.bind(wordEntity);
     }
 
     @Override
@@ -34,7 +30,7 @@ class WordEntityAdapter extends RecyclerView.Adapter<WordEntityViewHolder> {
         return things.size();
     }
 
-    public void setThings(List<WordEntity> things) {
-        this.things = things;
+    public void setDataList(List<WordEntity> wordEntityList) {
+        this.things = wordEntityList;
     }
 }

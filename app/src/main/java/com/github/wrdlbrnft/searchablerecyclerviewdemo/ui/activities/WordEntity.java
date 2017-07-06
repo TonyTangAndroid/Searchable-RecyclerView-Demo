@@ -1,34 +1,28 @@
 package com.github.wrdlbrnft.searchablerecyclerviewdemo.ui.activities;
 
-/**
- * Created with Android Studio
- * User: Xaver
- * Date: 24/05/15
- */
 public class WordEntity {
 
-    private final long mId;
-    private final int mRank;
-    private final String mWord;
+    private final long id;
+    private final int rank;
+    private final String word;
 
     public WordEntity(long id, int rank, String word) {
-        mId = id;
-        mRank = rank;
-        mWord = word;
+        this.id = id;
+        this.rank = rank;
+        this.word = word;
     }
 
     public long getId() {
-        return mId;
+        return id;
     }
 
     public int getRank() {
-        return mRank;
+        return rank;
     }
 
     public String getWord() {
-        return mWord;
+        return word;
     }
-
 
     @Override
     public String toString() {
