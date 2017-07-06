@@ -28,4 +28,10 @@ public class WordEntity {
     public String getWord() {
         return mWord;
     }
+
+
+    @Override
+    public String toString() {
+        return "";
+    }
 }
