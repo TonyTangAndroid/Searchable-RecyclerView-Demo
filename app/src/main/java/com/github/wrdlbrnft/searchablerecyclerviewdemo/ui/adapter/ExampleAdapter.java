@@ -11,13 +11,6 @@ import com.github.wrdlbrnft.searchablerecyclerviewdemo.ui.models.WordModel;
 
 import java.util.List;
 
-import hugo.weaving.DebugLog;
-
-/**
- * Created with Android Studio
- * User: Xaver
- * Date: 24/05/15
- */
 public class ExampleAdapter extends RecyclerView.Adapter<WordViewHolder> {
 
 
@@ -40,9 +33,10 @@ public class ExampleAdapter extends RecyclerView.Adapter<WordViewHolder> {
 
     public void setFilterWordModelList(List<WordModel> filterWordModelList) {
         this.filterWordModelList = filterWordModelList;
+        notifyDataSetChanged();
+
     }
 
-    @DebugLog
     @Override
     public WordViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_word, parent, false);

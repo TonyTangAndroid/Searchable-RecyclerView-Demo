@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SearchView;
@@ -13,15 +14,26 @@ import android.widget.SearchView;
 import com.github.wrdlbrnft.searchablerecyclerviewdemo.R;
 import com.github.wrdlbrnft.searchablerecyclerviewdemo.ui.adapter.ExampleAdapter;
 import com.github.wrdlbrnft.searchablerecyclerviewdemo.ui.models.WordModel;
+import com.jakewharton.rxbinding2.widget.RxSearchView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
+import hugo.weaving.DebugLog;
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
+
+public class MainActivity extends AppCompatActivity {
 
     private ExampleAdapter adapter;
+    private Disposable subscribe;
 
-    private static List<WordModel> filter(List<WordModel> models, String query) {
+    private List<WordModel> filter(List<WordModel> models, String query) {
         final String lowerCaseQuery = query.toLowerCase();
 
         final List<WordModel> filteredModelList = new ArrayList<>();
@@ -60,22 +72,60 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         final MenuItem searchItem = menu.findItem(R.id.action_search);
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-        searchView.setOnQueryTextListener(this);
-
+        Observable<List<WordModel>> listObservable = getListObservableWithSwitchMap(searchView);
+//        Observable<List<WordModel>> listObservable = getListObservableWithFlatMap(searchView);
+        subscribe = listObservable.subscribe(this::onNewResultReady);
         return true;
     }
 
-    @Override
-    public boolean onQueryTextChange(String query) {
-        final List<WordModel> filteredModelList = filter(adapter.getWordModelList(), query);
-        adapter.setFilterWordModelList(filteredModelList);
-        adapter.notifyDataSetChanged();
-        return true;
+    private Observable<List<WordModel>> getListObservableWithSwitchMap(SearchView searchView) {
+        return RxSearchView.queryTextChanges(searchView)
+
+                .switchMap(new Function<CharSequence, ObservableSource<? extends List<WordModel>>>() {
+                    @Override
+                    public ObservableSource<List<WordModel>> apply(@NonNull CharSequence charSequence) throws Exception {
+                        return Observable.fromCallable(() -> doFilter(charSequence)).subscribeOn(Schedulers.computation());
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+
+    @SuppressWarnings("unused")
+    private Observable<List<WordModel>> getListObservableWithFlatMap(SearchView searchView) {
+        return RxSearchView.queryTextChanges(searchView)
+
+                .flatMap(new Function<CharSequence, ObservableSource<? extends List<WordModel>>>() {
+                    @Override
+                    public ObservableSource<List<WordModel>> apply(@NonNull CharSequence charSequence) throws Exception {
+                        return Observable.fromCallable(() -> doFilter(charSequence)).subscribeOn(Schedulers.computation());
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+
+    private void onNewResultReady(List<WordModel> wordModels) {
+        Log.d("MainActivity", " new data size:" + wordModels.size());
+        adapter.setFilterWordModelList(wordModels);
     }
 
     @Override
-    public boolean onQueryTextSubmit(String query) {
-        return false;
+    protected void onDestroy() {
+        super.onDestroy();
+        subscribe.dispose();
+    }
+
+    @DebugLog
+    private List<WordModel> doFilter(CharSequence searchViewQueryTextEvent) {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            //if it is switchMap, the thread will be interrupted and the result will not be ignored in the downstream.
+            // If it is flatMap, the thread won't be interrupted and the result will be ignored in the downstream except the latest one, which is exactly what we need in search use case.
+            e.printStackTrace();
+        }
+        return filter(adapter.getWordModelList(), searchViewQueryTextEvent.toString());
     }
 
 
