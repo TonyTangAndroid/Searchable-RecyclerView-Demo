@@ -1,4 +1,4 @@
-package com.github.wrdlbrnft.searchablerecyclerviewdemo.ui.adapter;
+package com.github.wrdlbrnft.searchablerecyclerviewdemo.ui.activities;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -6,45 +6,43 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.wrdlbrnft.searchablerecyclerviewdemo.R;
-import com.github.wrdlbrnft.searchablerecyclerviewdemo.ui.adapter.viewholder.WordViewHolder;
-import com.github.wrdlbrnft.searchablerecyclerviewdemo.ui.models.WordModel;
 
 import java.util.List;
 
-public class ExampleAdapter extends RecyclerView.Adapter<WordViewHolder> {
+public class WordEntityAdapter extends RecyclerView.Adapter<WordEntityViewHolder> {
 
 
-    private List<WordModel> wordModelList;
-    private List<WordModel> filterWordModelList;
+    private List<WordEntity> wordModelList;
+    private List<WordEntity> filterWordModelList;
 
-    public List<WordModel> getWordModelList() {
+    public List<WordEntity> getWordModelList() {
         return wordModelList;
     }
 
-    public void setWordModelList(List<WordModel> wordModelList) {
+    public void setWordModelList(List<WordEntity> wordModelList) {
         this.wordModelList = wordModelList;
         this.filterWordModelList = wordModelList;
         notifyDataSetChanged();
     }
 
-    public List<WordModel> getFilterWordModelList() {
+    public List<WordEntity> getFilterWordModelList() {
         return filterWordModelList;
     }
 
-    public void setFilterWordModelList(List<WordModel> filterWordModelList) {
+    public void setFilterWordModelList(List<WordEntity> filterWordModelList) {
         this.filterWordModelList = filterWordModelList;
         notifyDataSetChanged();
 
     }
 
     @Override
-    public WordViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public WordEntityViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_word, parent, false);
-        return new WordViewHolder(view);
+        return new WordEntityViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(WordViewHolder holder, int position) {
+    public void onBindViewHolder(WordEntityViewHolder holder, int position) {
         holder.bind(getFilterWordModelList().get(position));
     }
 

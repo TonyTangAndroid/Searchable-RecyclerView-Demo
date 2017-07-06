@@ -1,17 +1,17 @@
-package com.github.wrdlbrnft.searchablerecyclerviewdemo.ui.models;
+package com.github.wrdlbrnft.searchablerecyclerviewdemo.ui.activities;
 
 /**
  * Created with Android Studio
  * User: Xaver
  * Date: 24/05/15
  */
-public class WordModel {
+public class WordEntity {
 
     private final long mId;
     private final int mRank;
     private final String mWord;
 
-    public WordModel(long id, int rank, String word) {
+    public WordEntity(long id, int rank, String word) {
         mId = id;
         mRank = rank;
         mWord = word;

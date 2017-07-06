@@ -12,8 +12,6 @@ import android.view.MenuItem;
 import android.widget.SearchView;
 
 import com.github.wrdlbrnft.searchablerecyclerviewdemo.R;
-import com.github.wrdlbrnft.searchablerecyclerviewdemo.ui.adapter.ExampleAdapter;
-import com.github.wrdlbrnft.searchablerecyclerviewdemo.ui.models.WordModel;
 import com.jakewharton.rxbinding2.widget.RxSearchView;
 
 import java.util.ArrayList;
@@ -30,14 +28,14 @@ import io.reactivex.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ExampleAdapter adapter;
+    private WordEntityAdapter adapter;
     private Disposable subscribe;
 
-    private List<WordModel> filter(List<WordModel> models, String query) {
+    private List<WordEntity> filter(List<WordEntity> models, String query) {
         final String lowerCaseQuery = query.toLowerCase();
 
-        final List<WordModel> filteredModelList = new ArrayList<>();
-        for (WordModel model : models) {
+        final List<WordEntity> filteredModelList = new ArrayList<>();
+        for (WordEntity model : models) {
             final String text = model.getWord().toLowerCase();
             final String rank = String.valueOf(model.getRank());
             if (text.contains(lowerCaseQuery) || rank.contains(lowerCaseQuery)) {
@@ -53,15 +51,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         setSupportActionBar((Toolbar) findViewById(R.id.tool_bar));
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        adapter = new ExampleAdapter();
+        adapter = new WordEntityAdapter();
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
-        List<WordModel> mModels = new ArrayList<>();
+        List<WordEntity> mModels = new ArrayList<>();
         final String[] words = getResources().getStringArray(R.array.words);
         for (int i = 0; i < words.length; i++) {
-            mModels.add(new WordModel(i, i + 1, words[i]));
+            mModels.add(new WordEntity(i, i + 1, words[i]));
         }
         adapter.setWordModelList(mModels);
     }
@@ -72,18 +70,18 @@ public class MainActivity extends AppCompatActivity {
 
         final MenuItem searchItem = menu.findItem(R.id.action_search);
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-        Observable<List<WordModel>> listObservable = getListObservableWithSwitchMap(searchView);
+        Observable<List<WordEntity>> listObservable = getListObservableWithSwitchMap(searchView);
 //        Observable<List<WordModel>> listObservable = getListObservableWithFlatMap(searchView);
         subscribe = listObservable.subscribe(this::onNewResultReady);
         return true;
     }
 
-    private Observable<List<WordModel>> getListObservableWithSwitchMap(SearchView searchView) {
+    private Observable<List<WordEntity>> getListObservableWithSwitchMap(SearchView searchView) {
         return RxSearchView.queryTextChanges(searchView)
 
-                .switchMap(new Function<CharSequence, ObservableSource<? extends List<WordModel>>>() {
+                .switchMap(new Function<CharSequence, ObservableSource<? extends List<WordEntity>>>() {
                     @Override
-                    public ObservableSource<List<WordModel>> apply(@NonNull CharSequence charSequence) throws Exception {
+                    public ObservableSource<List<WordEntity>> apply(@NonNull CharSequence charSequence) throws Exception {
                         return Observable.fromCallable(() -> doFilter(charSequence)).subscribeOn(Schedulers.computation());
                     }
                 })
@@ -92,12 +90,12 @@ public class MainActivity extends AppCompatActivity {
 
 
     @SuppressWarnings("unused")
-    private Observable<List<WordModel>> getListObservableWithFlatMap(SearchView searchView) {
+    private Observable<List<WordEntity>> getListObservableWithFlatMap(SearchView searchView) {
         return RxSearchView.queryTextChanges(searchView)
 
-                .flatMap(new Function<CharSequence, ObservableSource<? extends List<WordModel>>>() {
+                .flatMap(new Function<CharSequence, ObservableSource<? extends List<WordEntity>>>() {
                     @Override
-                    public ObservableSource<List<WordModel>> apply(@NonNull CharSequence charSequence) throws Exception {
+                    public ObservableSource<List<WordEntity>> apply(@NonNull CharSequence charSequence) throws Exception {
                         return Observable.fromCallable(() -> doFilter(charSequence)).subscribeOn(Schedulers.computation());
                     }
                 })
@@ -105,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void onNewResultReady(List<WordModel> wordModels) {
+    private void onNewResultReady(List<WordEntity> wordModels) {
         Log.d("MainActivity", " new data size:" + wordModels.size());
         adapter.setFilterWordModelList(wordModels);
     }
@@ -117,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @DebugLog
-    private List<WordModel> doFilter(CharSequence searchViewQueryTextEvent) {
+    private List<WordEntity> doFilter(CharSequence searchViewQueryTextEvent) {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
