@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import hugo.weaving.DebugLog;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -62,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
                 .scan(Pair.create(Collections.emptyList(), null), this::doCalculateDiff)
                 .skip(1)
                 .observeOn(AndroidSchedulers.mainThread())
+                .distinctUntilChanged(listDiffResultPair -> listDiffResultPair.first)
                 .subscribe(this::onDataReady);
 
     }
@@ -97,14 +99,15 @@ public class MainActivity extends AppCompatActivity {
         return wordEntityArrayList;
     }
 
+    @DebugLog
     private List<WordEntity> doFilter(CharSequence searchViewQueryTextEvent) {
-//        try {
-//            Thread.sleep(1000);
-//        } catch (InterruptedException e) {
-//            //if it is switchMap, the thread will be interrupted and the result will not be ignored in the downstream.
-//            // If it is flatMap, the thread won't be interrupted and the result will be ignored in the downstream except the latest one, which is exactly what we need in search use case.
-//            e.printStackTrace();
-//        }
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            //if it is switchMap, the thread will be interrupted and the result will not be ignored in the downstream.
+            // If it is flatMap, the thread won't be interrupted and the result will be ignored in the downstream except the latest one, which is exactly what we need in search use case.
+            // e.printStackTrace();
+        }
         return getFilteredList(searchViewQueryTextEvent.toString());
     }
 
@@ -116,11 +119,13 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    @DebugLog
     private void onDataReady(Pair<List<WordEntity>, DiffUtil.DiffResult> listDiffResultPair) {
         adapter.setDataList(listDiffResultPair.first);
         listDiffResultPair.second.dispatchUpdatesTo(adapter);
     }
 
+    @DebugLog
     @NonNull
     private Pair<List<WordEntity>, DiffUtil.DiffResult> doCalculateDiff(Pair<List<WordEntity>, DiffUtil.DiffResult> pair, List<WordEntity> next) {
         WordEntityDiffCallback callback = new WordEntityDiffCallback(pair.first, next);
